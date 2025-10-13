@@ -8,6 +8,7 @@ import com.linktic.pruebacompralinktic.exception.ErrorGeneralException;
 import com.linktic.pruebacompralinktic.service.ICompraService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.text.MessageFormat;
@@ -16,6 +17,12 @@ import java.text.MessageFormat;
 @Slf4j
 @RequiredArgsConstructor
 public class CompraService implements ICompraService {
+
+  @Value("${producto.apikey}")
+  private String apiKeyProducto;
+
+  @Value("${inventario.apikey}")
+  private String apiKeyInventario;
 
   private final InventarioClient inventarioClient;
   private final ProductoClient productoClient;
@@ -73,7 +80,7 @@ public class CompraService implements ICompraService {
   private Integer validarDisponibilidadProducto(CompraProductoDto compraProductoDto) throws ErrorGeneralException {
     InventarioDtoOut inventario;
     try {
-      inventario = inventarioClient.obtenerInventarioProducto(compraProductoDto.getIdProducto());
+      inventario = inventarioClient.obtenerInventarioProducto(apiKeyInventario,compraProductoDto.getIdProducto());
     } catch (Exception e) {
       throw new ErrorGeneralException("Error consultando inventario");
     }
@@ -94,7 +101,7 @@ public class CompraService implements ICompraService {
   private void actualizarInventario(ActualizaInventarioDto actualizaInventarioDto) throws ErrorGeneralException {
     MensajeOutDto mensajeOutDto;
     try {
-      mensajeOutDto = inventarioClient.actualizarCantidad(actualizaInventarioDto);
+      mensajeOutDto = inventarioClient.actualizarCantidad(apiKeyInventario, actualizaInventarioDto);
     } catch (Exception e) {
       throw new ErrorGeneralException("Error actualizando inventario");
     }
@@ -112,7 +119,7 @@ public class CompraService implements ICompraService {
    */
   private ProductoDtoOut consultaProducto(CompraProductoDto compraProductoDto) throws ErrorGeneralException {
     try {
-      return productoClient.obtenerProductoPorId(compraProductoDto.getIdProducto());
+      return productoClient.obtenerProductoPorId(apiKeyProducto, compraProductoDto.getIdProducto());
     } catch (Exception e) {
       throw new ErrorGeneralException("Error consultando producto");
     }

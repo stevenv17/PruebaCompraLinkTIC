@@ -19,8 +19,10 @@ server:
 
 producto:
   url: ${MICROSERVICIO_PRODUCTO:http://localhost:8086/producto}
+  apikey: ${MICROSERVICIO_PRODUCTO_APIKEY:PRODUCTO_CLAVE_SECRETA_123}
 inventario:
   url: ${MICROSERVICIO_INVENTARIO:http://localhost:8087/inventario}
+  apikey: ${MICROSERVICIO_PRODUCTO_APIKEY:INVENTARIO_CLAVE_SECRETA_123}
 
 logging:
   level:
