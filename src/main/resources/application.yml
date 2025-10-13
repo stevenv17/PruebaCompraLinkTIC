@@ -1,0 +1,28 @@
+spring:
+  application:
+    name: pruebacompralinktic
+  profiles:
+    active: dev
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/linkticdb?allowPublicKeyRetrieval=true&useSSL=false}
+    username: ${SPRING_DATASOURCE_USERNAME:user}
+    password: ${SPRING_DATASOURCE_PASSWORD:pass}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: none
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+
+
+server:
+  port: 8088
+
+producto:
+  url: ${MICROSERVICIO_PRODUCTO:http://localhost:8086/producto}
+inventario:
+  url: ${MICROSERVICIO_INVENTARIO:http://localhost:8087/inventario}
+
+logging:
+  level:
+    root: INFO
+    com.linktic.pruebacompralinktic: DEBUG
