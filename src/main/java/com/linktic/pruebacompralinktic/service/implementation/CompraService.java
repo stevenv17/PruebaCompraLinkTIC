@@ -1,11 +1,13 @@
 package com.linktic.pruebacompralinktic.service.implementation;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.linktic.pruebacompralinktic.client.InventarioClient;
 import com.linktic.pruebacompralinktic.client.ProductoClient;
 import com.linktic.pruebacompralinktic.dto.*;
 import com.linktic.pruebacompralinktic.exception.ElementoNoEncontradoException;
 import com.linktic.pruebacompralinktic.exception.ErrorGeneralException;
 import com.linktic.pruebacompralinktic.service.ICompraService;
+import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -77,12 +79,29 @@ public class CompraService implements ICompraService {
    * @return cantidad disponible
    * @throws ErrorGeneralException excepción si ocurre un error
    */
-  private Integer validarDisponibilidadProducto(CompraProductoDto compraProductoDto) throws ErrorGeneralException {
+  private Integer validarDisponibilidadProducto(CompraProductoDto compraProductoDto) throws ErrorGeneralException, ElementoNoEncontradoException {
     InventarioDtoOut inventario;
+    String errorGeneral = "Error consultando inventario";
     try {
       inventario = inventarioClient.obtenerInventarioProducto(apiKeyInventario,compraProductoDto.getIdProducto());
+    } catch (FeignException e) {
+      String json = e.contentUTF8();
+      ObjectMapper mapper = new ObjectMapper();
+      ErrorResponse error;
+      try {
+        error = mapper.readValue(json, ErrorResponse.class);
+      } catch (Exception ex) {
+        throw new ErrorGeneralException(errorGeneral);
+      }
+      if(error.getCodigo() == 404) {
+        throw new ElementoNoEncontradoException(error.getMensaje());
+      }
+      if(error.getCodigo() == 500) {
+        throw new ErrorGeneralException(error.getMensaje());
+      }
+      throw new ErrorGeneralException(errorGeneral);
     } catch (Exception e) {
-      throw new ErrorGeneralException("Error consultando inventario");
+      throw new ErrorGeneralException(errorGeneral);
     }
 
     if(inventario.getCantidad() < compraProductoDto.getCantidad()) {
@@ -98,12 +117,29 @@ public class CompraService implements ICompraService {
    * @param actualizaInventarioDto datos para actualizar producto
    * @throws ErrorGeneralException excepción si ocurre error
    */
-  private void actualizarInventario(ActualizaInventarioDto actualizaInventarioDto) throws ErrorGeneralException {
+  private void actualizarInventario(ActualizaInventarioDto actualizaInventarioDto) throws ErrorGeneralException, ElementoNoEncontradoException {
     MensajeOutDto mensajeOutDto;
+    String errorGeneral = "Error al actualizar el inventario";
     try {
       mensajeOutDto = inventarioClient.actualizarCantidad(apiKeyInventario, actualizaInventarioDto);
+    } catch (FeignException e) {
+      String json = e.contentUTF8();
+      ObjectMapper mapper = new ObjectMapper();
+      ErrorResponse error;
+      try {
+        error = mapper.readValue(json, ErrorResponse.class);
+      } catch (Exception ex) {
+        throw new ErrorGeneralException(errorGeneral);
+      }
+      if(error.getCodigo() == 404) {
+        throw new ElementoNoEncontradoException(error.getMensaje());
+      }
+      if(error.getCodigo() == 500) {
+        throw new ErrorGeneralException(error.getMensaje());
+      }
+      throw new ErrorGeneralException(errorGeneral);
     } catch (Exception e) {
-      throw new ErrorGeneralException("Error actualizando inventario");
+      throw new ErrorGeneralException(errorGeneral);
     }
 
     if(!mensajeOutDto.getResultado().equals("EXITOSO")) {
@@ -117,11 +153,28 @@ public class CompraService implements ICompraService {
    * @return datos del producto
    * @throws ErrorGeneralException excepción si ocurre error
    */
-  private ProductoDtoOut consultaProducto(CompraProductoDto compraProductoDto) throws ErrorGeneralException {
+  private ProductoDtoOut consultaProducto(CompraProductoDto compraProductoDto) throws ErrorGeneralException, ElementoNoEncontradoException {
+    String errorGeneral = "Error consultando producto";
     try {
       return productoClient.obtenerProductoPorId(apiKeyProducto, compraProductoDto.getIdProducto());
+    } catch (FeignException e) {
+      String json = e.contentUTF8();
+      ObjectMapper mapper = new ObjectMapper();
+      ErrorResponse error;
+      try {
+        error = mapper.readValue(json, ErrorResponse.class);
+      } catch (Exception ex) {
+        throw new ErrorGeneralException(errorGeneral);
+      }
+      if(error.getCodigo() == 404) {
+        throw new ElementoNoEncontradoException(error.getMensaje());
+      }
+      if(error.getCodigo() == 500) {
+        throw new ErrorGeneralException(error.getMensaje());
+      }
+      throw new ErrorGeneralException(errorGeneral);
     } catch (Exception e) {
-      throw new ErrorGeneralException("Error consultando producto");
+      throw new ErrorGeneralException(errorGeneral);
     }
   }
 }
