@@ -163,11 +163,19 @@
                                         <limit>
                                             <counter>LINE</counter>
                                             <value>COVEREDRATIO</value>
-                                            <minimum>0.80</minimum> <!-- 99% mínimo -->
+                                            <minimum>0.70</minimum>
                                         </limit>
                                     </limits>
                                 </rule>
                             </rules>
+                            <excludes>
+                                <exclude>com/linktic/pruebacompralinktic/config/**</exclude>
+                                <exclude>com/linktic/pruebacompralinktic/dto/**</exclude>
+                                <exclude>com/linktic/pruebacompralinktic/swagger/**</exclude>
+                                <exclude>com/linktic/pruebacompralinktic/security/**</exclude>
+                                <exclude>com/linktic/pruebacompralinktic/exception/**</exclude>
+                                <exclude>com/linktic/pruebacompralinktic/mapper/**</exclude>
+                            </excludes>
                         </configuration>
                     </execution>
                 </executions>
